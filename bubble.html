@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Colorful Bubbles</title>
+    <style>
+        body{
+           margin: 0px;
+           background-color: rgb(56,220,250); 
+           overflow: hidden;
+        }
+    </style>
+</head>   
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        // Output "Hello World" to the console
+console.log("Hello World");
+
+// Get the canvas element and its 2D rendering context
+var canvas = document.getElementById("canvas");
+var c = canvas.getContext("2d");
+
+// Set canvas dimensions to match the window's inner width and height
+var tx = window.innerWidth;
+var ty = window.innerHeight;
+canvas.width = tx;
+canvas.height = ty;
+
+// Variables to track mouse coordinates
+var mousex = 0;
+var mousey = 0;
+
+// Event listener to update mouse coordinates on mouse movement
+addEventListener("mousemove", function() {
+  mousex = event.clientX;
+  mousey = event.clientY;
+});
+
+// Gravity coefficient for ball bouncing effect
+var grav = 0.99;
+
+// Set default stroke width for drawing
+c.strokeWidth = 5;
+
+// Function to generate a random color with transparency
+function randomColor() {
+  return (
+    "rgba(" +
+    Math.round(Math.random() * 250) +
+    "," +
+    Math.round(Math.random() * 250) +
+    "," +
+    Math.round(Math.random() * 250) +
+    "," +
+    Math.ceil(Math.random() * 10) / 10 +
+    ")"
+  );
+}
+
+// Ball constructor function
+function Ball() {
+  // Ball properties
+  this.color = randomColor();
+  this.radius = Math.random() * 20 + 14;
+  this.startradius = this.radius;
+  this.x = Math.random() * (tx - this.radius * 2) + this.radius;
+  this.y = Math.random() * (ty - this.radius);
+  this.dy = Math.random() * 2;
+  this.dx = Math.round((Math.random() - 0.5) * 10);
+  this.vel = Math.random() / 5;
+
+  // Method to draw/update the ball on the canvas
+  this.update = function() {
+    c.beginPath();
+    c.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
+    c.fillStyle = this.color;
+    c.fill();
+  };
+}
+
+// Array to store multiple ball objects
+var bal = [];
+for (var i = 0; i < 50; i++) {
+  bal.push(new Ball());
+}
+
+// Animation function to update the canvas continuously
+function animate() {
+  // Update canvas size if window size changes
+  if (tx != window.innerWidth || ty != window.innerHeight) {
+    tx = window.innerWidth;
+    ty = window.innerHeight;
+    canvas.width = tx;
+    canvas.height = ty;
+  }
+
+  // Request the next animation frame to create a smooth animation loop
+  requestAnimationFrame(animate);
+
+  // Clear the canvas before updating balls' positions
+  c.clearRect(0, 0, tx, ty);
+
+  // Loop through each ball and update its position, size, and behavior
+  for (var i = 0; i < bal.length; i++) {
+    bal[i].update();
+    bal[i].y += bal[i].dy;
+    bal[i].x += bal[i].dx;
+
+    // Ball bouncing effect based on canvas boundaries
+    if (bal[i].y + bal[i].radius >= ty) {
+      bal[i].dy = -bal[i].dy * grav;
+    } else {
+      bal[i].dy += bal[i].vel;
+    }
+
+    // Ball bouncing effect based on horizontal canvas boundaries
+    if (bal[i].x + bal[i].radius > tx || bal[i].x - bal[i].radius < 0) {
+      bal[i].dx = -bal[i].dx;
+    }
+
+    // Ball size and interaction with the mouse
+    if (
+      mousex > bal[i].x - 20 &&
+      mousex < bal[i].x + 20 &&
+      mousey > bal[i].y - 50 &&
+      mousey < bal[i].y + 50 &&
+      bal[i].radius < 70
+    ) {
+      bal[i].radius += 5;
+    } else {
+      if (bal[i].radius > bal[i].startradius) {
+        bal[i].radius -= 5;
+      }
+    }
+  }
+}
+
+// Start the animation loop
+animate();
+
+// Periodically add and remove balls from the array for continuous animation
+setInterval(function() {
+  ball.push(new Ball());
+  ball.splice(0, 1);
+}, 400);
+
+    </script>
+</body> 
+</html>
